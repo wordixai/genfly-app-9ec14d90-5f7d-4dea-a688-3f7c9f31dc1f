@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { generateExcelTemplate, parseExcelData } from "@/utils/excelUtils";
+import { parseExcelData } from "@/utils/excelUtils";
 import { CargoItem } from "@/types";
 import { Download, Upload } from "lucide-react";
 
@@ -13,31 +13,8 @@ export function FileUpload({ onCargoItemsLoaded }: FileUploadProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleDownloadTemplate = () => {
-    try {
-      // 生成模板
-      const blob = generateExcelTemplate();
-      
-      // 创建下载链接
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "cargo_template.csv";
-      
-      // 触发下载
-      document.body.appendChild(a);
-      a.click();
-      
-      // 清理
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
-    } catch (err) {
-      console.error("模板下载失败:", err);
-      setError("模板下载失败，请稍后再试");
-    }
-  };
+  // 直接提供CSV内容作为数据URL
+  const templateDataUrl = "data:text/csv;charset=utf-8,Name,Length (cm),Width (cm),Height (cm),Weight (kg),Quantity,Stackable (yes/no)\nBox A,100,80,60,50,10,yes\nPallet B,120,100,140,200,5,no\nCrate C,200,150,180,300,2,yes";
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,14 +42,20 @@ export function FileUpload({ onCargoItemsLoaded }: FileUploadProps) {
         <CardTitle>导入货物清单</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleDownloadTemplate}
+        <a 
+          href={templateDataUrl} 
+          download="cargo_template.csv"
+          className="w-full inline-block"
         >
-          <Download className="mr-2 h-4 w-4" />
-          下载模板
-        </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            type="button"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            下载模板
+          </Button>
+        </a>
         
         <div className="grid w-full items-center gap-1.5">
           <label
