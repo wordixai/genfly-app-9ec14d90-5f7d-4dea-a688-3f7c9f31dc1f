@@ -14,15 +14,29 @@ export function FileUpload({ onCargoItemsLoaded }: FileUploadProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handleDownloadTemplate = () => {
-    const blob = generateExcelTemplate();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "cargo_template.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      // 生成模板
+      const blob = generateExcelTemplate();
+      
+      // 创建下载链接
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cargo_template.csv";
+      
+      // 触发下载
+      document.body.appendChild(a);
+      a.click();
+      
+      // 清理
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    } catch (err) {
+      console.error("模板下载失败:", err);
+      setError("模板下载失败，请稍后再试");
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +54,7 @@ export function FileUpload({ onCargoItemsLoaded }: FileUploadProps) {
       console.error(err);
     } finally {
       setIsLoading(false);
-      // Reset the input
+      // 重置输入
       e.target.value = "";
     }
   };

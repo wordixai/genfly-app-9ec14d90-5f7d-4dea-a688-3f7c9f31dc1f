@@ -1,8 +1,7 @@
 import { CargoItem } from "@/types";
 
 export const generateExcelTemplate = (): Blob => {
-  // This is a simplified approach - in a real app, you'd use a library like xlsx or exceljs
-  // For this demo, we'll create a CSV file which can be opened in Excel
+  // 创建CSV格式的模板
   const headers = [
     "Name",
     "Length (cm)",
@@ -24,6 +23,7 @@ export const generateExcelTemplate = (): Blob => {
     ...exampleRows.map(row => row.join(","))
   ].join("\n");
   
+  // 创建Blob对象
   return new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 };
 
@@ -36,7 +36,7 @@ export const parseExcelData = (file: File): Promise<CargoItem[]> => {
         const csvData = event.target?.result as string;
         const lines = csvData.split("\n");
         
-        // Skip header row
+        // 跳过标题行
         const items: CargoItem[] = [];
         
         for (let i = 1; i < lines.length; i++) {
